@@ -5,3 +5,7 @@ blob-report/
 playwright/.auth/
 scratch/
 .DS_Store
+reports/
+all-blob-reports/
+.act-artifacts/
+.secrets
