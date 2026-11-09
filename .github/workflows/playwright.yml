@@ -14,6 +14,9 @@ jobs:
     name: Tests (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      BASE_URL: http://localhost:4200
+      API_URL: http://localhost:8091
     strategy:
       fail-fast: false
       matrix:
@@ -30,6 +33,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Start the Toolshop app
+        run: ./scripts/start-app.sh
+
       - name: Type check
         run: npx tsc --noEmit
 
@@ -38,6 +44,10 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Save app logs
+        if: ${{ failure() }}
+        run: mkdir -p reports && docker compose -f docker-compose.ci.yml logs > reports/app.log
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
